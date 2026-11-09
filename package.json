@@ -1,0 +1,13 @@
+{
+  "name": "ajaia-docs",
+  "version": "1.0.0",
+  "description": "Lightweight collaborative document editor (Ajaia assignment)",
+  "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  }
+}

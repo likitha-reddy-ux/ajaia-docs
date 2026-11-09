@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ajaia Docs</title>
+  <link rel="stylesheet" href="/styles.css?v=7">
+  <script src="/app.js?v=7" defer></script>
+</head>
+<body>
+
+  <!-- Icon set (used with <svg><use href="#i-..."></use></svg>). Hidden; purely visual. -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-doc" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" d="M6 3h8l4 4v14H6z"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M3 19c.6-3.2 3-5 6-5s5.4 1.8 6 5"/><circle cx="17" cy="9" r="2.4" fill="none" stroke="currentColor" stroke-width="1.6"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M16.5 14.2c2.3.2 3.9 1.7 4.5 4.3"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M12 15V4M7.5 8.5 12 4l4.5 4.5M5 15v4h14v-4"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="6" cy="12" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="18" cy="18.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path fill="none" stroke="currentColor" stroke-width="1.8" d="m8.2 10.8 7.6-4.1M8.2 13.2l7.6 4.1"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+  </svg>
+
+  <!-- ================= SIGN-IN ================= -->
+  <main id="login-screen" class="login" hidden>
+    <section class="login-card" aria-labelledby="login-heading">
+      <div class="brand brand-lg">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <h1 id="login-heading" class="brand-name">Ajaia Docs</h1>
+      </div>
+      <p class="muted">Write, format and share documents with your team.</p>
+
+      <form id="login-form" novalidate>
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username" placeholder="you@ajaia.test" required>
+        <label for="password">Password</label>
+        <input id="password" type="password" autocomplete="current-password" placeholder="Enter password" required>
+        <p id="login-error" class="form-error" role="alert"></p>
+        <button class="btn btn-primary btn-block" id="login-submit" type="submit">Sign in</button>
+      </form>
+
+      <div class="demo">
+        <p class="muted small" id="demo-help">Demo accounts for reviewers (password <b>Likitha@123</b>). Click a name to sign in instantly:</p>
+        <div class="demo-buttons" role="group" aria-describedby="demo-help">
+          <button type="button" class="btn btn-secondary" data-demo="likitha@ajaia.test">Likitha</button>
+          <button type="button" class="btn btn-secondary" data-demo="bhavitha@ajaia.test">Bhavitha</button>
+          <button type="button" class="btn btn-secondary" data-demo="harshitha@ajaia.test">Harshitha</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= APP ================= -->
+  <div id="app-screen" class="app" hidden>
+    <a class="skip-link" href="#main">Skip to document</a>
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">A</span>
+        <span class="brand-name">Ajaia Docs</span>
+      </div>
+      <div class="topbar-right">
+        <div class="user-chip">
+          <span class="avatar" id="user-avatar" aria-hidden="true"></span>
+          <span class="user-text"><b id="user-name"></b><span id="user-email"></span></span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="logout-btn" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-actions">
+          <button class="btn btn-primary btn-block" id="new-doc-btn" type="button">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> New document
+          </button>
+          <button class="btn btn-secondary btn-block" id="import-btn" type="button" aria-describedby="import-hint">
+            <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg> Import file
+          </button>
+          <input id="import-input" type="file" accept=".txt,.md" hidden>
+          <p class="hint" id="import-hint">Supported: .txt and .md (max 1 MB)</p>
+        </div>
+
+        <nav aria-label="Documents">
+          <h2 class="side-heading" id="owned-heading">My documents <span class="count" id="owned-count" aria-label="0 documents">0</span></h2>
+          <ul class="doc-list" id="owned-list" aria-labelledby="owned-heading"></ul>
+
+          <h2 class="side-heading" id="shared-heading">Shared with me <span class="count" id="shared-count" aria-label="0 documents">0</span></h2>
+          <ul class="doc-list" id="shared-list" aria-labelledby="shared-heading"></ul>
+        </nav>
+      </aside>
+
+      <!-- Main area -->
+      <main class="main" id="main" tabindex="-1">
+
+        <!-- Nothing open yet -->
+        <section id="empty-state" class="empty-state" aria-labelledby="empty-heading">
+          <svg class="empty-illustration" viewBox="0 0 120 120" aria-hidden="true">
+            <rect x="26" y="14" width="68" height="92" rx="6" fill="var(--surface)" stroke="var(--line-strong)" stroke-width="2"/>
+            <path d="M76 14v14h18" fill="none" stroke="var(--line-strong)" stroke-width="2"/>
+            <rect x="38" y="40" width="34" height="5" rx="2.5" fill="var(--accent-soft-2)"/>
+            <rect x="38" y="54" width="44" height="4" rx="2" fill="var(--line)"/>
+            <rect x="38" y="64" width="40" height="4" rx="2" fill="var(--line)"/>
+            <rect x="38" y="74" width="44" height="4" rx="2" fill="var(--line)"/>
+            <rect x="38" y="84" width="26" height="4" rx="2" fill="var(--line)"/>
+          </svg>
+          <h1 id="empty-heading">No document open</h1>
+          <p class="muted empty-text">Pick a document from the sidebar, or start a new one. Changes save automatically and you can share any document you own with your teammates.</p>
+          <div class="empty-actions">
+            <button class="btn btn-primary" id="empty-create-btn" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg> Create document
+            </button>
+            <button class="btn btn-secondary" id="empty-import-btn" type="button" aria-describedby="import-hint">
+              <svg class="icon" aria-hidden="true"><use href="#i-upload"></use></svg> Import a file
+            </button>
+          </div>
+        </section>
+
+        <!-- Shown while a document is being fetched -->
+        <p id="doc-loading" class="doc-loading" role="status" hidden>Opening document…</p>
+
+        <!-- The editor -->
+        <section id="editor-area" class="editor-view" aria-label="Document editor" hidden>
+          <div class="doc-header">
+            <label for="doc-title" class="visually-hidden">Document title</label>
+            <input id="doc-title" class="doc-title" type="text" maxlength="200" placeholder="Untitled document">
+            <div class="doc-actions">
+              <span id="save-status" class="save-status" role="status" aria-live="polite"></span>
+              <button class="btn btn-secondary btn-sm" id="save-btn" type="button" title="Save now (Ctrl+S)">Save</button>
+              <button class="btn btn-primary btn-sm" id="open-share-btn" type="button" aria-haspopup="dialog">
+                <svg class="icon" aria-hidden="true"><use href="#i-share"></use></svg> Share
+              </button>
+              <button class="btn btn-danger btn-sm" id="delete-btn" type="button">Delete</button>
+            </div>
+          </div>
+          <p class="doc-info" id="doc-info"></p>
+
+          <div class="banner banner-error" id="conflict-banner" role="alert" hidden>
+            <span class="banner-text">Someone else saved this document while you were editing. Your latest changes are still on screen but have <b>not</b> been saved.</span>
+            <span class="banner-actions">
+              <button class="btn btn-secondary btn-sm" id="conflict-load" type="button">Load their version</button>
+              <button class="btn btn-primary btn-sm" id="conflict-keep" type="button">Keep my version</button>
+            </span>
+          </div>
+
+          <div class="banner" id="viewer-banner" role="note" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+            <span id="viewer-banner-text"></span>
+          </div>
+
+          <!-- Toolbar -->
+          <div class="toolbar" id="toolbar" role="toolbar" aria-label="Text formatting">
+            <label for="block-select" class="visually-hidden">Text style</label>
+            <select id="block-select">
+              <option value="p">Normal text</option>
+              <option value="h1">Heading 1</option>
+              <option value="h2">Heading 2</option>
+              <option value="h3">Heading 3</option>
+            </select>
+            <span class="tb-sep" aria-hidden="true"></span>
+            <button type="button" data-cmd="bold" aria-label="Bold" aria-pressed="false" title="Bold (Ctrl+B)"><b>B</b></button>
+            <button type="button" data-cmd="italic" aria-label="Italic" aria-pressed="false" title="Italic (Ctrl+I)"><i>I</i></button>
+            <button type="button" data-cmd="underline" aria-label="Underline" aria-pressed="false" title="Underline (Ctrl+U)"><u>U</u></button>
+            <span class="tb-sep" aria-hidden="true"></span>
+            <button type="button" data-cmd="insertUnorderedList" aria-label="Bulleted list" aria-pressed="false" title="Bulleted list">• List</button>
+            <button type="button" data-cmd="insertOrderedList" aria-label="Numbered list" aria-pressed="false" title="Numbered list">1. List</button>
+            <span class="tb-sep" aria-hidden="true"></span>
+            <button type="button" data-cmd="undo" aria-label="Undo" title="Undo (Ctrl+Z)">↶ Undo</button>
+            <button type="button" data-cmd="redo" aria-label="Redo" title="Redo (Ctrl+Y)">↷ Redo</button>
+          </div>
+
+          <!-- The paper page -->
+          <article id="editor" class="page" contenteditable="true" spellcheck="true"
+                   role="textbox" aria-multiline="true" aria-label="Document content"></article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ================= SHARE DIALOG ================= -->
+  <dialog id="share-dialog" class="dialog" aria-labelledby="share-heading">
+    <h2 id="share-heading">Share “<span id="share-doc-title"></span>”</h2>
+    <p class="muted small">People you add will find this document under <b>Shared with me</b>. Editors can change it; viewers can only read it.</p>
+
+    <h3 class="dialog-label">Owner</h3>
+    <div class="person person-owner" id="share-owner"></div>
+
+    <h3 class="dialog-label">Add people</h3>
+    <div class="share-row">
+      <label for="share-user" class="visually-hidden">Person to share with</label>
+      <select id="share-user"></select>
+      <label for="share-role" class="visually-hidden">Access level</label>
+      <select id="share-role">
+        <option value="editor">Can edit</option>
+        <option value="viewer">Can view</option>
+      </select>
+      <button class="btn btn-primary btn-sm" id="share-btn" type="button">Add</button>
+    </div>
+    <p id="share-error" class="form-error" role="alert"></p>
+
+    <h3 class="dialog-label" id="share-count-heading">People with access</h3>
+    <ul id="share-list" class="share-list" aria-labelledby="share-count-heading"></ul>
+
+    <div class="dialog-footer">
+      <button class="btn btn-secondary btn-sm" id="share-close" type="button">Done</button>
+    </div>
+  </dialog>
+
+  <!-- ================= DELETE CONFIRMATION ================= -->
+  <dialog id="delete-dialog" class="dialog dialog-sm" aria-labelledby="delete-heading" aria-describedby="delete-desc">
+    <h2 id="delete-heading">Delete this document?</h2>
+    <p id="delete-desc" class="dialog-text">
+      “<b id="delete-doc-title"></b>” will be permanently deleted. Anyone it is shared with will lose access. This cannot be undone.
+    </p>
+    <div class="dialog-footer">
+      <button class="btn btn-secondary btn-sm" id="delete-cancel" type="button">Cancel</button>
+      <button class="btn btn-danger-solid btn-sm" id="delete-confirm" type="button">Delete document</button>
+    </div>
+  </dialog>
+
+  <!-- Short messages (success / error) -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

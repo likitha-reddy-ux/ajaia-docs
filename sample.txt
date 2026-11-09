@@ -1,0 +1,3 @@
+Hello from a plain text file.
+Each line becomes its own paragraph.
+This one is the third line.
